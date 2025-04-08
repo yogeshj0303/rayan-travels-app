@@ -1,4 +1,5 @@
 import 'package:driver_application/auth/splash_screen.dart';
+import 'package:driver_application/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 
@@ -18,7 +19,11 @@ class DriverApplication extends StatelessWidget {
         primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const SplashScreen(),
+      home: const MainScreen(),
     );
   }
 }
+
+
+// class MyHomePage extends StatefulWidget {
+//   const MyHomePage({super.key});
