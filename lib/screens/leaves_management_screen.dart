@@ -1,3 +1,4 @@
+import 'package:driver_application/screens/apply_leave_screen.dart';
 import 'package:flutter/material.dart';
 
 class LeavesManagementScreen extends StatelessWidget {
@@ -7,8 +8,7 @@ class LeavesManagementScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Define theme colors to match app's design with more professional palette
     final primaryGold = Colors.amber.shade700;
-    final secondaryGold = Colors.amber.shade300;
-    final darkText = Colors.grey.shade900;
+    final darkText = Color(0xFF0B192E); // Darker shade of gold
 
     // Calculate the bottom padding needed
     final bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -16,19 +16,19 @@ class LeavesManagementScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF0B192E),
         elevation: 0,
         titleSpacing: 8,
         toolbarHeight: 56, // More compact
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: secondaryGold, size: 22),
+          icon: Icon(Icons.arrow_back, color: primaryGold, size: 22),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Row(
           children: [
             Icon(
               Icons.event_available_rounded,
-              color: secondaryGold,
+              color: primaryGold,
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -44,13 +44,17 @@ class LeavesManagementScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list, color: secondaryGold, size: 22),
+            icon: Icon(Icons.add_circle_outline, color: primaryGold, size: 22),
             onPressed: () {
-              // Show leave filters
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ApplyLeaveScreen()),
+              );
             },
           ),
           IconButton(
-            icon: Icon(Icons.calendar_month, color: secondaryGold, size: 22),
+            icon: Icon(Icons.calendar_month, color: primaryGold, size: 22),
             onPressed: () {
               // Show calendar view
             },
@@ -69,8 +73,8 @@ class LeavesManagementScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF1A1A1A),
+                    const Color(0xFF0B192E),
+                    const Color(0xFF0B192E).withOpacity(0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -109,7 +113,7 @@ class LeavesManagementScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Decorative elements
                   Positioned(
                     top: -20,
@@ -123,7 +127,7 @@ class LeavesManagementScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Card content
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -161,13 +165,13 @@ class LeavesManagementScreen extends StatelessWidget {
                                   Icon(
                                     Icons.calendar_today,
                                     size: 12,
-                                    color: secondaryGold,
+                                    color: primaryGold,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'MAY 2023',
                                     style: TextStyle(
-                                      color: secondaryGold,
+                                      color: primaryGold,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 11,
                                     ),
@@ -177,7 +181,7 @@ class LeavesManagementScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         // Middle - Available leaves count
                         FittedBox(
                           fit: BoxFit.scaleDown,
@@ -207,7 +211,7 @@ class LeavesManagementScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         // Bottom - Leave types summary
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -243,7 +247,7 @@ class LeavesManagementScreen extends StatelessWidget {
                                 'Earned',
                                 '4 days',
                                 Icons.star,
-                                secondaryGold,
+                                primaryGold,
                               ),
                             ),
                           ],
@@ -287,7 +291,8 @@ class LeavesManagementScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -322,7 +327,7 @@ class LeavesManagementScreen extends StatelessWidget {
               const Color(0xFF42A5F5),
               isPending: true,
             ),
-            
+
             // Leave History Section
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
@@ -355,7 +360,8 @@ class LeavesManagementScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -560,16 +566,9 @@ class LeavesManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeaveRequestItem(
-    BuildContext context,
-    String title,
-    String status,
-    String date,
-    String duration,
-    String reason,
-    Color color,
-    {required bool isPending}
-  ) {
+  Widget _buildLeaveRequestItem(BuildContext context, String title,
+      String status, String date, String duration, String reason, Color color,
+      {required bool isPending}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -583,7 +582,8 @@ class LeavesManagementScreen extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: isPending ? color.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
+          color:
+              isPending ? color.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -608,15 +608,17 @@ class LeavesManagementScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    title.contains('Sick') ? Icons.medical_services :
-                    title.contains('Earned') ? Icons.star : 
-                    Icons.beach_access,
+                    title.contains('Sick')
+                        ? Icons.medical_services
+                        : title.contains('Earned')
+                            ? Icons.star
+                            : Icons.beach_access,
                     color: color,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 14),
-                
+
                 // Leave details
                 Expanded(
                   child: Column(
@@ -643,14 +645,17 @@ class LeavesManagementScreen extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: isPending ? Colors.amber.withOpacity(0.2) : 
-                                      Colors.green.withOpacity(0.1),
+                              color: isPending
+                                  ? Colors.amber.withOpacity(0.2)
+                                  : Colors.green.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
                               status,
                               style: TextStyle(
-                                color: isPending ? Colors.amber.shade800 : Colors.green.shade700,
+                                color: isPending
+                                    ? Colors.amber.shade800
+                                    : Colors.green.shade700,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 10,
                               ),

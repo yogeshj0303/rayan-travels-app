@@ -2,7 +2,6 @@ import 'package:driver_application/auth/splash_screen.dart';
 import 'package:driver_application/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
-
 void main() {
   runApp(const DriverApplication());
 }
@@ -16,14 +15,9 @@ class DriverApplication extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Driver Application',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }
-
-
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({super.key});

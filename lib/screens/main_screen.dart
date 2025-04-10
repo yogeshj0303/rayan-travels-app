@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:driver_application/theme/theme_constants.dart';
 import 'home_screen.dart';
 import 'wallet_screen.dart';
 import 'leaves_management_screen.dart';
 import 'expense_screen.dart';
 import 'attendance_screen.dart';
 import 'diesel_section_screen.dart';
-import 'notifications_screen.dart';
 import 'boarding_screen.dart';
+import 'apply_leave_screen.dart';
+import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,27 +19,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  
+
   final List<Widget> _screens = [
     const HomeScreen(),
     const WalletScreen(),
     const ExpenseScreen(),
     const AttendanceScreen(),
-    const NotificationsScreen(),
+    const ProfileScreen(), // Replace NotificationsScreen
   ];
 
   @override
   Widget build(BuildContext context) {
     // Define colors to match the app's black and gold theme
-    final orangeColor = Colors.orange;
-    
+    final orangeColor = Color(0xFFD88226); // Replace with your orange color
+
     return Scaffold(
       body: _screens[_selectedIndex],
       extendBody: true,
       bottomNavigationBar: Container(
         height: 65,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: ThemeConstants.secondaryBlue,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
@@ -53,27 +55,27 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Left side items
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(Icons.grid_view_rounded, 'HOME', 0),
-                  _buildNavItem(Icons.account_balance_wallet_rounded, 'WALLET', 1),
+                  _buildNavItem(
+                      Icons.account_balance_wallet_rounded, 'WALLET', 1),
                 ],
               ),
             ),
-            
+
             // Center button
             _buildCenterButton(context, orangeColor),
-            
             // Right side items
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(Icons.receipt_long_rounded, 'EXPENSES', 2),
-                  _buildNotificationNavItem('ALERTS', 4),
+                  _buildNavItem(Icons.person_outline, 'PROFILE',
+                      4), // Replace notification nav item
                 ],
               ),
             ),
@@ -82,11 +84,11 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-  
+
   Widget _buildNavItem(IconData icon, String label, int index) {
-    final orangeColor = Colors.orange;
+    final orangeColor = Color(0xFFD88226); // Replace with your orange color
     final isSelected = _selectedIndex == index;
-    
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -115,68 +117,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-  
-  Widget _buildNotificationNavItem(String label, int index) {
-    final orangeColor = Colors.orange;
-    final isSelected = _selectedIndex == index;
-    
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            children: [
-              Icon(
-                Icons.notifications_rounded,
-                size: 24,
-                color: isSelected ? orangeColor : Colors.white.withOpacity(0.5),
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(1),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 12,
-                    minHeight: 12,
-                  ),
-                  child: const Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? orangeColor : Colors.white.withOpacity(0.5),
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
+
   Widget _buildCenterButton(BuildContext context, Color orangeColor) {
     return Container(
       width: 50,
@@ -188,18 +129,17 @@ class _MainScreenState extends State<MainScreen> {
       child: IconButton(
         icon: const Icon(
           Icons.apps_rounded,
-          color: Colors.black,
+          color: Color(0xFF0B192E),
           size: 24,
         ),
         onPressed: () => _showQuickAccessMenu(context),
       ),
     );
   }
-  
+
   void _showQuickAccessMenu(BuildContext context) {
-    final goldAccent = Colors.amber.shade200;
-    final darkGold = Colors.amber.shade800;
-    
+    final goldAccent = Color(0xFFD88226); // Replace with your gold accent color
+    final darkGold = Color(0xFFD88226); // Replace with your dark gold color
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -207,7 +147,7 @@ class _MainScreenState extends State<MainScreen> {
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: const BoxDecoration(
-            color: Colors.black,
+            color: Color(0xFF0B192E),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -257,7 +197,8 @@ class _MainScreenState extends State<MainScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const DieselSectionScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const DieselSectionScreen()),
                       );
                     },
                   ),
@@ -270,7 +211,8 @@ class _MainScreenState extends State<MainScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LeavesManagementScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ApplyLeaveScreen()),
                       );
                     },
                   ),
@@ -283,7 +225,8 @@ class _MainScreenState extends State<MainScreen> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const BoardingScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const BoardingScreen()),
                       );
                     },
                   ),
@@ -296,7 +239,7 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
-  
+
   Widget _buildQuickAccessItem(
     BuildContext context,
     String title,
@@ -340,4 +283,4 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-} 
+}

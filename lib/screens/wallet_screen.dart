@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
@@ -7,18 +6,17 @@ class WalletScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define theme colors to match app's design with more professional palette
-    final primaryGold = Colors.amber.shade700;
-    final secondaryGold = Colors.amber.shade300;
-    final darkText = Colors.grey.shade900;
-
+    final primaryGold = Color(0xFFD88226);
+    final darkText = Color(0xFF0B192E);
 
     // Calculate the bottom padding needed to account for the bottom navigation bar
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 65; // 65 is the height of the bottom nav bar
+    final bottomPadding = MediaQuery.of(context).padding.bottom +
+        65; // 65 is the height of the bottom nav bar
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF0B192E),
         elevation: 0,
         titleSpacing: 8,
         toolbarHeight: 56, // More compact
@@ -26,7 +24,7 @@ class WalletScreen extends StatelessWidget {
           children: [
             Icon(
               Icons.account_balance_wallet_rounded,
-              color: secondaryGold,
+              color: primaryGold,
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -42,13 +40,13 @@ class WalletScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.history, color: secondaryGold, size: 22),
+            icon: Icon(Icons.history, color: primaryGold, size: 22),
             onPressed: () {
               // Show full transaction history
             },
           ),
           IconButton(
-            icon: Icon(Icons.more_vert, color: secondaryGold, size: 22),
+            icon: Icon(Icons.more_vert, color: primaryGold, size: 22),
             onPressed: () {
               // Show wallet options menu
             },
@@ -56,29 +54,29 @@ class WalletScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        // Add padding at the bottom to prevent content from being hidden behind the nav bar
         padding: EdgeInsets.only(bottom: bottomPadding),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Balance Card (more compact and professional)
+            // Balance Card with enhanced styling
             Container(
               margin: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              height: 180, // Fixed height for compactness
+              height: 130, // Reduced height
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF1A1A1A),
+                    darkText,
+                    darkText.withOpacity(0.95),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 12,
+                    color: darkText.withOpacity(0.2),
+                    blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
                 ],
@@ -88,7 +86,7 @@ class WalletScreen extends StatelessWidget {
                   // Subtle pattern overlay
                   Positioned.fill(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                       child: ShaderMask(
                         shaderCallback: (rect) {
                           return LinearGradient(
@@ -108,7 +106,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Decorative elements
                   Positioned(
                     top: -20,
@@ -122,34 +120,76 @@ class WalletScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
-                  // Card content
+
+                  // Updated Card content with smaller sizes
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment:
+                          MainAxisAlignment.center, // Center content vertically
                       children: [
-                        // Top row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              'Available Balance',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Available Balance',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 11, // Smaller font
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4), // Reduced spacing
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '₹',
+                                      style: TextStyle(
+                                        color: primaryGold,
+                                        fontSize: 16, // Smaller font
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    const Text(
+                                      '2,450',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 28, // Smaller font
+                                        fontWeight: FontWeight.bold,
+                                        height: 0.9,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        '.00',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 16, // Smaller font
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
+                                horizontal: 12,
+                                vertical: 6,
                               ),
                               decoration: BoxDecoration(
                                 color: primaryGold.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: primaryGold.withOpacity(0.3),
                                   width: 1,
@@ -158,17 +198,17 @@ class WalletScreen extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.account_balance,
-                                    size: 12,
-                                    color: secondaryGold,
+                                    Icons.account_balance_rounded,
+                                    size: 14,
+                                    color: primaryGold,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 6),
                                   Text(
                                     'Virtual',
                                     style: TextStyle(
-                                      color: secondaryGold,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11,
+                                      color: primaryGold,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -176,373 +216,157 @@ class WalletScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
-                        // Balance display
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                '₹',
-                                style: TextStyle(
-                                  color: secondaryGold,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                '2,450',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              Text(
-                                '.00',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Transactions Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Left side - Enhanced section title
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryGold.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: primaryGold.withOpacity(0.15),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.receipt_long_rounded,
+                          size: 16,
+                          color: primaryGold,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'TRANSACTIONS',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: darkText,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                        
-                        // Quick actions row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ],
+                    ),
+                  ),
+
+                  // Right side - Filter button with animation
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.circular(30),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: primaryGold.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
                           children: [
-                            _buildBalanceAction(
-                              context,
-                              Icons.add_circle_outline,
-                              'Add Money',
-                              secondaryGold,
+                            Icon(
+                              Icons.tune_rounded,
+                              size: 16,
+                              color: primaryGold,
                             ),
-                            Container(
-                              width: 1,
-                              height: 24,
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                            _buildBalanceAction(
-                              context,
-                              Icons.send_outlined,
-                              'Send Money',
-                              secondaryGold,
-                            ),
-                            Container(
-                              width: 1,
-                              height: 24,
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                            _buildBalanceAction(
-                              context,
-                              Icons.qr_code_scanner_outlined,
-                              'Scan & Pay',
-                              secondaryGold,
+                            const SizedBox(width: 4),
+                            Text(
+                              'FILTER',
+                              style: TextStyle(
+                                color: primaryGold,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Quick Payment Options (enhanced)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 3,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: primaryGold,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
-                        margin: const EdgeInsets.only(right: 8),
-                      ),
-                      Text(
-                        'QUICK PAYMENTS',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: darkText,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                      minimumSize: const Size(0, 36),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'VIEW ALL',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
-                            letterSpacing: 0.8,
-                            color: primaryGold,
-                          ),
-                        ),
-                        Icon(Icons.chevron_right, size: 16, color: primaryGold),
-                      ],
-                    ),
+            // Enhanced Transaction List
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
                   ),
                 ],
               ),
-            ),
-
-            // Quick Payment Options cards
-            SizedBox(
-              height: 110,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
                 children: [
-                  _buildQuickPaymentOption(
+                  const SizedBox(height: 8),
+                  _buildTransactionItem(
                     context,
-                    'Fuel',
+                    'Fuel Payment',
+                    'Yesterday, 3:45 PM',
+                    '- ₹450',
                     Icons.local_gas_station_rounded,
-                    const Color(0xFF7C4DFF),
+                    const Color(0xFFFF7043),
+                    isDebit: true,
                   ),
-                  _buildQuickPaymentOption(
+                  _buildTransactionItem(
                     context,
-                    'Food',
-                    Icons.restaurant,
-                    const Color(0xFFE53935),
+                    'Trip Bonus',
+                    'May 22, 2023',
+                    '+ ₹1,200',
+                    Icons.monetization_on,
+                    const Color(0xFF66BB6A),
+                    isDebit: false,
                   ),
-                  _buildQuickPaymentOption(
+                  _buildTransactionItem(
                     context,
-                    'Toll',
+                    'Toll Payment',
+                    'May 20, 2023',
+                    '- ₹125',
                     Icons.car_rental,
-                    const Color(0xFF1E88E5),
+                    const Color(0xFF42A5F5),
+                    isDebit: true,
                   ),
-                  _buildQuickPaymentOption(
+                  _buildTransactionItem(
                     context,
-                    'Recharge',
-                    Icons.phone_android,
-                    const Color(0xFF43A047),
-                  ),
-                  _buildQuickPaymentOption(
-                    context,
-                    'More',
-                    Icons.grid_view,
-                    const Color(0xFF607D8B),
+                    'Weekly Incentive',
+                    'May 18, 2023',
+                    '+ ₹600',
+                    Icons.card_giftcard,
+                    const Color(0xFF9575CD),
+                    isDebit: false,
                   ),
                 ],
               ),
-            ),
-
-            // Recent Transactions
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 3,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: primaryGold,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
-                        margin: const EdgeInsets.only(right: 8),
-                      ),
-                      Text(
-                        'RECENT TRANSACTIONS',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: darkText,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                      minimumSize: const Size(0, 36),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'VIEW ALL',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
-                            letterSpacing: 0.8,
-                            color: primaryGold,
-                          ),
-                        ),
-                        Icon(Icons.chevron_right, size: 16, color: primaryGold),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Transactions list (enhanced)
-            _buildTransactionItem(
-              context,
-              'Fuel Payment',
-              'Yesterday, 3:45 PM',
-              '- ₹450',
-              Icons.local_gas_station_rounded,
-              const Color(0xFFFF7043),
-              isDebit: true,
-            ),
-            _buildTransactionItem(
-              context,
-              'Trip Bonus',
-              'May 22, 2023',
-              '+ ₹1,200',
-              Icons.monetization_on,
-              const Color(0xFF66BB6A),
-              isDebit: false,
-            ),
-            _buildTransactionItem(
-              context,
-              'Toll Payment',
-              'May 20, 2023',
-              '- ₹125',
-              Icons.car_rental,
-              const Color(0xFF42A5F5),
-              isDebit: true,
-            ),
-            _buildTransactionItem(
-              context,
-              'Weekly Incentive',
-              'May 18, 2023',
-              '+ ₹600',
-              Icons.card_giftcard,
-              const Color(0xFF9575CD),
-              isDebit: false,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBalanceAction(
-    BuildContext context,
-    IconData icon,
-    String label,
-    Color color,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // Handle tap on balance action
-        },
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: color,
-                size: 22,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickPaymentOption(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      width: 75,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            // Handle quick payment option tap
-          },
-          borderRadius: BorderRadius.circular(15),
-          child: Column(
-            children: [
-              Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: color.withOpacity(0.3),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey.shade800,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -600,7 +424,7 @@ class WalletScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                
+
                 // Transaction details
                 Expanded(
                   child: Column(
@@ -624,20 +448,20 @@ class WalletScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Amount
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: isDebit 
-                        ? Colors.red.shade50 
-                        : Colors.green.shade50,
+                    color: isDebit ? Colors.red.shade50 : Colors.green.shade50,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     amount,
                     style: TextStyle(
-                      color: isDebit ? Colors.red.shade700 : Colors.green.shade700,
+                      color:
+                          isDebit ? Colors.red.shade700 : Colors.green.shade700,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -650,4 +474,4 @@ class WalletScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

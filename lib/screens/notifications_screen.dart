@@ -6,47 +6,60 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define theme colors to match app's design with more professional palette
-    final primaryGold = Colors.amber.shade700;
-    final secondaryGold = Colors.amber.shade300;
+    final primaryGold = Color(0xFFD88226);
     final darkText = Colors.grey.shade900;
 
     // Calculate the bottom padding needed to account for the bottom navigation bar
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 65; // 65 is the height of the bottom nav bar
+    final bottomPadding = MediaQuery.of(context).padding.bottom +
+        65; // 65 is the height of the bottom nav bar
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF0B192E),
         elevation: 0,
-        titleSpacing: 8,
+        titleSpacing: 0,
         toolbarHeight: 56, // More compact
+        centerTitle: false,
+        leading: IconButton(
+          icon: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: primaryGold.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.arrow_back, color: primaryGold)),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Row(
           children: [
-            Icon(
-              Icons.notifications_rounded,
-              color: secondaryGold,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'Notifications',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+            Row(
+              children: [
+                const SizedBox(width: 8),
+                const Text(
+                  'Notifications',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list, color: secondaryGold, size: 22),
+            icon: Icon(Icons.filter_list, color: primaryGold, size: 22),
             onPressed: () {
               // Show notification filters
             },
           ),
           IconButton(
-            icon: Icon(Icons.done_all, color: secondaryGold, size: 22),
+            icon: Icon(Icons.done_all, color: primaryGold, size: 22),
             onPressed: () {
               // Mark all as read
             },
@@ -66,8 +79,8 @@ class NotificationsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF1A1A1A),
+                    const Color(0xFF0B192E),
+                    const Color(0xFF0B192E),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -106,7 +119,7 @@ class NotificationsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Decorative elements
                   Positioned(
                     top: -20,
@@ -120,7 +133,7 @@ class NotificationsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Card content
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -174,7 +187,7 @@ class NotificationsScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         // Bottom - Categories summary
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -183,7 +196,7 @@ class NotificationsScreen extends StatelessWidget {
                               context,
                               'System',
                               '3',
-                              secondaryGold,
+                              primaryGold,
                             ),
                             _buildNotificationStat(
                               context,
@@ -244,7 +257,8 @@ class NotificationsScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -259,7 +273,8 @@ class NotificationsScreen extends StatelessWidget {
                             color: primaryGold,
                           ),
                         ),
-                        Icon(Icons.delete_outline, size: 16, color: primaryGold),
+                        Icon(Icons.delete_outline,
+                            size: 16, color: primaryGold),
                       ],
                     ),
                   ),
@@ -328,7 +343,8 @@ class NotificationsScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -343,7 +359,8 @@ class NotificationsScreen extends StatelessWidget {
                             color: primaryGold,
                           ),
                         ),
-                        Icon(Icons.delete_outline, size: 16, color: primaryGold),
+                        Icon(Icons.delete_outline,
+                            size: 16, color: primaryGold),
                       ],
                     ),
                   ),
@@ -412,7 +429,8 @@ class NotificationsScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -499,15 +517,9 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationItem(
-    BuildContext context,
-    String title,
-    String time,
-    String message,
-    IconData icon,
-    Color color,
-    {required bool isUnread}
-  ) {
+  Widget _buildNotificationItem(BuildContext context, String title, String time,
+      String message, IconData icon, Color color,
+      {required bool isUnread}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -521,7 +533,8 @@ class NotificationsScreen extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: isUnread ? color.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
+          color:
+              isUnread ? color.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -552,7 +565,7 @@ class NotificationsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                
+
                 // Notification details
                 Expanded(
                   child: Column(
@@ -566,7 +579,9 @@ class NotificationsScreen extends StatelessWidget {
                             child: Text(
                               title,
                               style: TextStyle(
-                                fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
+                                fontWeight: isUnread
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
                                 fontSize: 14,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -578,7 +593,9 @@ class NotificationsScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 11,
-                              fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
+                              fontWeight: isUnread
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
                           ),
                         ],
@@ -597,7 +614,7 @@ class NotificationsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Unread indicator
                 if (isUnread)
                   Container(
@@ -616,4 +633,4 @@ class NotificationsScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -9,14 +9,15 @@ class BoardingScreen extends StatefulWidget {
   State<BoardingScreen> createState() => _BoardingScreenState();
 }
 
-class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProviderStateMixin {
+class _BoardingScreenState extends State<BoardingScreen>
+    with SingleTickerProviderStateMixin {
   bool _isScanning = true;
   bool _isProcessing = false;
   String _lastScanned = '';
   bool _torchEnabled = false;
   String? _errorMessage;
   MobileScannerController? _scannerController;
-  
+
   // Animation controller for scanner line
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -24,7 +25,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize scanner controller with error handling
     try {
       _scannerController = MobileScannerController(
@@ -40,13 +41,13 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
         _errorMessage = "Failed to initialize camera: $e";
       });
     }
-    
+
     // Initialize animation controller for scanner line
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    
+
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
@@ -67,23 +68,23 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
   // Method to handle successful scans
   void _handleSuccessfulScan(String code) {
     if (!mounted) return;
-    
+
     setState(() {
       _lastScanned = code;
       _isScanning = false;
       _isProcessing = true;
     });
-    
+
     // Simulate processing the code
     Timer(const Duration(milliseconds: 800), () {
       if (mounted) {
         setState(() {
           _isProcessing = false;
         });
-        
+
         // Show the success notification
         _showSuccessNotification(code);
-        
+
         // Reset after delay
         Timer(const Duration(seconds: 3), () {
           if (mounted) {
@@ -95,7 +96,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
       }
     });
   }
-  
+
   // Method to show success notification
   void _showSuccessNotification(String code) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -129,7 +130,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
     setState(() {
       _errorMessage = null;
     });
-    
+
     // Re-initialize scanner
     try {
       _scannerController?.dispose();
@@ -187,11 +188,8 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              _torchEnabled ? Icons.flash_on : Icons.flash_off,
-              color: secondaryGold, 
-              size: 22
-            ),
+            icon: Icon(_torchEnabled ? Icons.flash_on : Icons.flash_off,
+                color: secondaryGold, size: 22),
             onPressed: () {
               try {
                 setState(() {
@@ -206,11 +204,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
             },
           ),
           IconButton(
-            icon: Icon(
-              Icons.settings,
-              color: secondaryGold, 
-              size: 22
-            ),
+            icon: Icon(Icons.settings, color: secondaryGold, size: 22),
             onPressed: () {
               // Could implement scanner settings here
               // For now just a placeholder
@@ -229,7 +223,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
           // Error state
           if (_errorMessage != null)
             _buildErrorState(primaryGold, secondaryGold)
-          // Normal scanner state  
+          // Normal scanner state
           else
             Stack(
               children: [
@@ -238,7 +232,7 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                   controller: _scannerController,
                   onDetect: (capture) {
                     if (!_isScanning || _isProcessing) return;
-                    
+
                     try {
                       final List<Barcode> barcodes = capture.barcodes;
                       for (final barcode in barcodes) {
@@ -258,17 +252,18 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                     // Set the error message state
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       setState(() {
-                        _errorMessage = "Scanner error: ${error.errorDetails?.message ?? 'Unknown error'}";
+                        _errorMessage =
+                            "Scanner error: ${error.errorDetails?.message ?? 'Unknown error'}";
                       });
                     });
-                    
+
                     // Return an empty container, as the error UI is built elsewhere
                     return Container();
                   },
                 ),
-                
+
                 // Overlay elements
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: double.infinity,
                   child: Stack(
@@ -298,37 +293,65 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                           ],
                         ),
                       ),
-                      
+
                       // Corner markers
                       Positioned(
-                        top: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 - 20,
-                        left: (MediaQuery.of(context).size.width - scannerOverlaySize) / 2 - 20,
+                        top: (MediaQuery.of(context).size.height -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        left: (MediaQuery.of(context).size.width -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
                         child: _buildCornerMarker(primaryGold, topLeft: true),
                       ),
                       Positioned(
-                        top: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 - 20,
-                        right: (MediaQuery.of(context).size.width - scannerOverlaySize) / 2 - 20,
+                        top: (MediaQuery.of(context).size.height -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        right: (MediaQuery.of(context).size.width -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
                         child: _buildCornerMarker(primaryGold, topRight: true),
                       ),
                       Positioned(
-                        bottom: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 - 20,
-                        left: (MediaQuery.of(context).size.width - scannerOverlaySize) / 2 - 20,
-                        child: _buildCornerMarker(primaryGold, bottomLeft: true),
+                        bottom: (MediaQuery.of(context).size.height -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        left: (MediaQuery.of(context).size.width -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        child:
+                            _buildCornerMarker(primaryGold, bottomLeft: true),
                       ),
                       Positioned(
-                        bottom: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 - 20,
-                        right: (MediaQuery.of(context).size.width - scannerOverlaySize) / 2 - 20,
-                        child: _buildCornerMarker(primaryGold, bottomRight: true),
+                        bottom: (MediaQuery.of(context).size.height -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        right: (MediaQuery.of(context).size.width -
+                                    scannerOverlaySize) /
+                                2 -
+                            20,
+                        child:
+                            _buildCornerMarker(primaryGold, bottomRight: true),
                       ),
-                      
+
                       // Animated scanner line
                       if (_isScanning && !_isProcessing)
                         AnimatedBuilder(
                           animation: _animationController,
                           builder: (context, child) {
                             return Positioned(
-                              top: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 + 
-                                   (_animation.value * scannerOverlaySize),
+                              top: (MediaQuery.of(context).size.height -
+                                          scannerOverlaySize) /
+                                      2 +
+                                  (_animation.value * scannerOverlaySize),
                               child: Container(
                                 width: scannerOverlaySize - 20,
                                 height: 2,
@@ -355,12 +378,15 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                             );
                           },
                         ),
-                      
+
                       // Processing indicator
                       if (_isProcessing)
                         Positioned(
-                          top: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 + 
-                                (scannerOverlaySize / 2) - 25,
+                          top: (MediaQuery.of(context).size.height -
+                                      scannerOverlaySize) /
+                                  2 +
+                              (scannerOverlaySize / 2) -
+                              25,
                           child: Container(
                             width: 50,
                             height: 50,
@@ -374,10 +400,13 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                             ),
                           ),
                         ),
-                      
+
                       // Instructions
                       Positioned(
-                        bottom: (MediaQuery.of(context).size.height - scannerOverlaySize) / 2 - 80,
+                        bottom: (MediaQuery.of(context).size.height -
+                                    scannerOverlaySize) /
+                                2 -
+                            80,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -394,9 +423,9 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                           child: Column(
                             children: [
                               Text(
-                                _isProcessing 
-                                  ? 'Processing QR code...' 
-                                  : 'Position QR Code within frame',
+                                _isProcessing
+                                    ? 'Processing QR code...'
+                                    : 'Position QR Code within frame',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -405,9 +434,9 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _isProcessing 
-                                  ? 'Please wait a moment' 
-                                  : 'Scanning will happen automatically',
+                                _isProcessing
+                                    ? 'Please wait a moment'
+                                    : 'Scanning will happen automatically',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.7),
                                   fontSize: 12,
@@ -417,9 +446,11 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                           ),
                         ),
                       ),
-                      
+
                       // Last scanned data display
-                      if (_lastScanned.isNotEmpty && !_isScanning && !_isProcessing)
+                      if (_lastScanned.isNotEmpty &&
+                          !_isScanning &&
+                          !_isProcessing)
                         Positioned(
                           bottom: 40,
                           child: Container(
@@ -466,7 +497,8 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
                                 const SizedBox(height: 8),
                                 Container(
                                   constraints: BoxConstraints(
-                                    maxWidth: MediaQuery.of(context).size.width * 0.7,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.7,
                                   ),
                                   child: Text(
                                     _lastScanned,
@@ -565,7 +597,8 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryGold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -578,7 +611,8 @@ class _BoardingScreenState extends State<BoardingScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildCornerMarker(Color color, {
+  Widget _buildCornerMarker(
+    Color color, {
     bool topLeft = false,
     bool topRight = false,
     bool bottomLeft = false,
@@ -681,4 +715,4 @@ class CornerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}

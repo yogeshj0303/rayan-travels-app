@@ -1,27 +1,125 @@
 import 'package:driver_application/screens/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:driver_application/auth/login_screen.dart'; // Import the login screen
 
 class DriverRegistrationScreen extends StatefulWidget {
   const DriverRegistrationScreen({super.key});
 
   @override
-  State<DriverRegistrationScreen> createState() => _DriverRegistrationScreenState();
+  State<DriverRegistrationScreen> createState() =>
+      _DriverRegistrationScreenState();
 }
 
 class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  // Basic Info Controllers
   final _nameController = TextEditingController();
-  final _licenseController = TextEditingController();
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  DateTime _selectedDOB = DateTime.now();
+  final _addressController = TextEditingController();
+  File? _profilePhoto;
+
+  // License & ID Controllers
+  final _licenseController = TextEditingController();
+  DateTime _licenseExpiry = DateTime.now();
+  final _aadharController = TextEditingController();
+  final _panController = TextEditingController();
+
+  // Add new document storage variables
+  File? _licenseDocument;
+  File? _aadharDocument;
+
+  // Bus & Employment Controllers
+  final _busNumberController = TextEditingController();
+  DateTime _joiningDate = DateTime.now();
+  final _salaryController = TextEditingController();
+  String? _employmentType;
+
+  // Dropdown options
+  final List<String> _employmentTypes = ['Full Time', 'Part Time', 'Contract'];
+
   bool _isLoading = false;
-  bool _isSubmitted = false;
+
+  // Updated primary colors
+  final Color primaryBrown = const Color(0xFFD88226);
+  final Color secondaryBlue = const Color(0xFF0B192E);
+
+  // State to manage collapsible sections
+  bool _isBasicInfoExpanded = true;
+  bool _isLicenseInfoExpanded = false;
+  bool _isEmploymentInfoExpanded = false;
 
   @override
   void dispose() {
     _nameController.dispose();
-    _licenseController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
+    _licenseController.dispose();
+    _aadharController.dispose();
+    _panController.dispose();
+    _busNumberController.dispose();
+    _salaryController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickProfilePhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() => _profilePhoto = File(image.path));
+    }
+  }
+
+  Future<void> _pickDocument(String type) async {
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: secondaryBlue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: primaryBrown.withOpacity(0.2)),
+        ),
+        title: Text(
+          'Select Document Source',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: primaryBrown),
+              title: Text('Camera', style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: primaryBrown),
+              title: Text('Gallery', style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? document = await picker.pickImage(source: source);
+      if (document != null) {
+        setState(() {
+          if (type == 'license') {
+            _licenseDocument = File(document.path);
+          } else if (type == 'aadhar') {
+            _aadharDocument = File(document.path);
+          }
+        });
+        _showSnackbar('Document uploaded successfully');
+      }
+    }
   }
 
   Future<void> _submitForm() async {
@@ -36,53 +134,54 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _isSubmitted = true;
         });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Registration submitted for admin approval'),
-            backgroundColor: Colors.amber.shade800,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+
+        _showSnackbar('Registration successful');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
           ),
         );
       }
     }
   }
 
-  void _simulateApproval() async {
-    setState(() {
-      _isLoading = true;
-    });
-    
-    await Future.delayed(const Duration(seconds: 2));
-    
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Your registration has been approved!'),
-          backgroundColor: Colors.amber.shade800,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
-      
-      Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => const MainScreen(),
-      ));
-    }
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: primaryBrown,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: secondaryBlue, // Updated background color
       extendBodyBehindAppBar: true,
       body: Container(
         decoration: BoxDecoration(
@@ -90,9 +189,9 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black,
-              Colors.grey.shade900.withOpacity(0.8),
-              Colors.black,
+              secondaryBlue,
+              secondaryBlue.withOpacity(0.8),
+              secondaryBlue,
             ],
           ),
           image: DecorationImage(
@@ -100,7 +199,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
             fit: BoxFit.cover,
             opacity: 0.05,
             colorFilter: ColorFilter.mode(
-              Colors.amber.withOpacity(0.1),
+              primaryBrown.withOpacity(0.1),
               BlendMode.overlay,
             ),
           ),
@@ -109,7 +208,8 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
           child: SingleChildScrollView(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 50.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 50.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -123,19 +223,19 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.amber.shade200,
+                            color: primaryBrown.withOpacity(0.5),
                             width: 1.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.amber.withOpacity(0.2),
+                              color: primaryBrown.withOpacity(0.2),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
                           ],
                           gradient: RadialGradient(
                             colors: [
-                              Colors.amber.withOpacity(0.15),
+                              primaryBrown.withOpacity(0.15),
                               Colors.transparent,
                             ],
                             stops: const [0.1, 1.0],
@@ -153,7 +253,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      
+
                       // Company name and tagline - centered
                       const Text(
                         'RAYAN TRAVELS',
@@ -169,13 +269,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                         width: 120,
                         height: 1,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              Colors.amber.shade200,
-                              Colors.transparent,
-                            ],
-                          ),
+                          gradient: _getDividerGradient(),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -187,142 +281,42 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                           letterSpacing: 1.5,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
-                      // Header text with decorative elements
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.amber.shade200.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (!_isSubmitted) 
-                              Icon(
-                                Icons.star,
-                                size: 14,
-                                color: Colors.amber.shade200,
-                              ),
-                            if (!_isSubmitted) const SizedBox(width: 8),
-                            Text(
-                              _isSubmitted ? 'APPLICATION PENDING APPROVAL' : 'JOIN OUR ELITE TEAM',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: _isSubmitted ? Colors.amber.shade200 : Colors.white,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            if (!_isSubmitted) const SizedBox(width: 8),
-                            if (!_isSubmitted) 
-                              Icon(
-                                Icons.star,
-                                size: 14,
-                                color: Colors.amber.shade200,
-                              ),
-                          ],
-                        ),
-                      ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Main content
-                      if (_isSubmitted) 
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.only(bottom: 24),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.amber.withOpacity(0.3)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.amber.withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withOpacity(0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.hourglass_top,
-                                  color: Colors.amber.shade200,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'PENDING APPROVAL',
-                                      style: TextStyle(
-                                        color: Colors.amber.shade200,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    const Text(
-                                      'Your application is being reviewed by our team',
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      
-                      // Form fields or submitted info
-                      Container(
-                        width: double.infinity,
-                        constraints: const BoxConstraints(
-                          maxWidth: 400,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(20.0),
-                        child: _isSubmitted
-                            ? _buildSubmittedInfo()
-                            : _buildRegistrationForm(),
+                      // Collapsible sections
+                      _buildCollapsibleSection(
+                        title: 'BASIC INFORMATION',
+                        isExpanded: _isBasicInfoExpanded,
+                        onToggle: () => setState(
+                            () => _isBasicInfoExpanded = !_isBasicInfoExpanded),
+                        content: _buildBasicInfoSection(),
                       ),
-                      
+                      const SizedBox(height: 16),
+
+                      _buildCollapsibleSection(
+                        title: 'LICENSE & ID DETAILS',
+                        isExpanded: _isLicenseInfoExpanded,
+                        onToggle: () => setState(() =>
+                            _isLicenseInfoExpanded = !_isLicenseInfoExpanded),
+                        content: _buildLicenseInfoSection(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildCollapsibleSection(
+                        title: 'BUS & EMPLOYMENT INFO',
+                        isExpanded: _isEmploymentInfoExpanded,
+                        onToggle: () => setState(() =>
+                            _isEmploymentInfoExpanded =
+                                !_isEmploymentInfoExpanded),
+                        content: _buildEmploymentInfoSection(),
+                      ),
+
                       const SizedBox(height: 24),
-                      
+
                       // Button with enhanced styling
                       Container(
                         width: double.infinity,
@@ -334,9 +328,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: _isSubmitted 
-                                  ? Colors.amber.withOpacity(0.2) 
-                                  : Colors.white.withOpacity(0.1),
+                              color: Colors.white.withOpacity(0.1),
                               blurRadius: 8,
                               spreadRadius: 0,
                               offset: const Offset(0, 2),
@@ -344,14 +336,10 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: _isLoading 
-                              ? null 
-                              : (_isSubmitted ? _simulateApproval : _submitForm),
+                          onPressed: _isLoading ? null : _submitForm,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _isSubmitted 
-                                ? Colors.amber.shade700 
-                                : Colors.white,
-                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            foregroundColor: primaryBrown,
                             disabledBackgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -363,34 +351,67 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
-                                    color: _isSubmitted ? Colors.black : Colors.amber.shade700,
+                                    color: primaryBrown,
                                     strokeWidth: 2,
                                   ),
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    if (!_isSubmitted) 
-                                      Icon(
-                                        Icons.verified_user_outlined,
-                                        size: 16,
-                                        color: Colors.amber.shade800,
-                                      ),
-                                    if (!_isSubmitted) const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.verified_user_outlined,
+                                      size: 16,
+                                      color: primaryBrown,
+                                    ),
+                                    const SizedBox(width: 8),
                                     Text(
-                                      _isSubmitted ? 'CHECK STATUS' : 'REGISTER',
+                                      'REGISTER',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1.5,
-                                        color: _isSubmitted ? Colors.black : Colors.amber.shade800,
+                                        color: primaryBrown,
                                       ),
                                     ),
                                   ],
                                 ),
                         ),
                       ),
-                      
+
+                      const SizedBox(height: 16),
+
+                      // Login option
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account? ',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 12,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            ),
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                color: primaryBrown,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
                       // Terms text with subtle divider
                       Column(
                         children: [
@@ -403,7 +424,7 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
                           Text(
                             'By registering, you agree to our Terms & Privacy Policy',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.4), 
+                              color: Colors.white.withOpacity(0.4),
                               fontSize: 10,
                             ),
                             textAlign: TextAlign.center,
@@ -420,261 +441,544 @@ class _DriverRegistrationScreenState extends State<DriverRegistrationScreen> {
       ),
     );
   }
-  
-  Widget _buildRegistrationForm() {
+
+  Widget _buildCollapsibleSection({
+    required String title,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+    required Widget content,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: primaryBrown.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+            trailing: Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
+              color: Colors.white,
+            ),
+            onTap: onToggle,
+          ),
+          if (isExpanded)
+            Padding(padding: const EdgeInsets.all(16.0), child: content),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBasicInfoSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 3,
-              height: 16,
-              color: Colors.amber.shade200,
-              margin: const EdgeInsets.only(right: 8),
-            ),
-            const Text(
-              'PERSONAL INFORMATION',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        // Profile Photo
+        Center(
+          child: GestureDetector(
+            onTap: _pickProfilePhoto,
+            child: _buildProfilePhotoContainer(),
+          ),
         ),
         const SizedBox(height: 20),
-        TextFormField(
+
+        // Name Field
+        _buildTextField(
           controller: _nameController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'FULL NAME',
-            labelStyle: TextStyle(
-              color: Colors.amber.shade200.withOpacity(0.7),
-              fontSize: 12,
-              letterSpacing: 1,
-            ),
-            prefixIcon: Icon(Icons.person_outline, color: Colors.amber.shade200.withOpacity(0.7), size: 20),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.amber.shade200),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            errorStyle: TextStyle(color: Colors.redAccent.shade200, fontSize: 10),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
-            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          ),
+          label: 'FULL NAME',
+          icon: Icons.person_outline,
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Please enter your name' : null,
+        ),
+        const SizedBox(height: 16),
+
+        // Email Field
+        _buildTextField(
+          controller: _emailController,
+          label: 'EMAIL',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your name';
+            if (value?.isEmpty ?? true) return 'Please enter your email';
+            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+              return 'Please enter a valid email';
             }
             return null;
           },
         ),
         const SizedBox(height: 16),
-        TextFormField(
-          controller: _licenseController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'LICENSE NUMBER',
-            labelStyle: TextStyle(
-              color: Colors.amber.shade200.withOpacity(0.7),
-              fontSize: 12,
-              letterSpacing: 1,
-            ),
-            prefixIcon: Icon(Icons.badge_outlined, color: Colors.amber.shade200.withOpacity(0.7), size: 20),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.amber.shade200),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            errorStyle: TextStyle(color: Colors.redAccent.shade200, fontSize: 10),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
-            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your license number';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
+
+        // Phone Number Field
+        _buildTextField(
           controller: _phoneController,
-          style: const TextStyle(color: Colors.white),
+          label: 'PHONE NUMBER',
+          icon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: 'PHONE NUMBER',
-            labelStyle: TextStyle(
-              color: Colors.amber.shade200.withOpacity(0.7),
-              fontSize: 12,
-              letterSpacing: 1,
-            ),
-            prefixIcon: Icon(Icons.phone_outlined, color: Colors.amber.shade200.withOpacity(0.7), size: 20),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.amber.shade200),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.redAccent.shade200),
-            ),
-            errorStyle: TextStyle(color: Colors.redAccent.shade200, fontSize: 10),
-            filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
-            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your phone number';
-            }
-            if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+            if (value?.isEmpty ?? true) return 'Please enter your phone number';
+            if (!RegExp(r'^\d{10}$').hasMatch(value!)) {
               return 'Please enter a valid 10-digit phone number';
             }
             return null;
           },
         ),
+        const SizedBox(height: 16),
+
+        // Date of Birth
+        _buildDatePicker(
+          label: 'DATE OF BIRTH',
+          selectedDate: _selectedDOB,
+          onDateSelected: (date) => setState(() => _selectedDOB = date),
+        ),
+        const SizedBox(height: 16),
+
+        // Address Field
+        _buildTextField(
+          controller: _addressController,
+          label: 'ADDRESS',
+          icon: Icons.location_on_outlined,
+          maxLines: 3,
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Please enter your address' : null,
+        ),
       ],
     );
   }
-  
-  Widget _buildSubmittedInfo() {
+
+  Widget _buildLicenseInfoSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // License Number with upload button
         Row(
           children: [
-            Container(
-              width: 3,
-              height: 16,
-              color: Colors.amber.shade200,
-              margin: const EdgeInsets.only(right: 8),
+            Expanded(
+              child: _buildTextField(
+                controller: _licenseController,
+                label: 'LICENSE NUMBER',
+                icon: Icons.badge_outlined,
+                validator: (value) => value?.isEmpty ?? true
+                    ? 'Please enter license number'
+                    : null,
+              ),
             ),
-            const Text(
-              'APPLICATION DETAILS',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.bold,
+            const SizedBox(width: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: IconButton(
+                onPressed: () => _pickDocument('license'),
+                icon: Icon(
+                  _licenseDocument != null
+                      ? Icons.check_circle
+                      : Icons.upload_file,
+                  color: _licenseDocument != null ? Colors.green : primaryBrown,
+                ),
+                tooltip: 'Upload License Document',
               ),
             ),
           ],
         ),
-        const SizedBox(height: 20),
-        _buildInfoRow(Icons.person_outline, 'Full Name', _nameController.text),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.white.withOpacity(0.1),
-                  Colors.transparent,
-                ],
+        const SizedBox(height: 16),
+
+        // License Expiry
+        _buildDatePicker(
+          label: 'LICENSE EXPIRY',
+          selectedDate: _licenseExpiry,
+          onDateSelected: (date) => setState(() => _licenseExpiry = date),
+        ),
+        const SizedBox(height: 16),
+
+        // Aadhar Number with upload button
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                controller: _aadharController,
+                label: 'AADHAR NUMBER',
+                icon: Icons.credit_card_outlined,
+                validator: (value) => value?.isEmpty ?? true
+                    ? 'Please enter Aadhar number'
+                    : null,
               ),
             ),
-          ),
-        ),
-        _buildInfoRow(Icons.badge_outlined, 'License Number', _licenseController.text),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.white.withOpacity(0.1),
-                  Colors.transparent,
-                ],
+            const SizedBox(width: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: IconButton(
+                onPressed: () => _pickDocument('aadhar'),
+                icon: Icon(
+                  _aadharDocument != null
+                      ? Icons.check_circle
+                      : Icons.upload_file,
+                  color: _aadharDocument != null ? Colors.green : primaryBrown,
+                ),
+                tooltip: 'Upload Aadhar Document',
               ),
             ),
-          ),
+          ],
         ),
-        _buildInfoRow(Icons.phone_outlined, 'Phone Number', _phoneController.text),
+        const SizedBox(height: 16),
+
+        // PAN Number
+        _buildTextField(
+          controller: _panController,
+          label: 'PAN NUMBER',
+          icon: Icons.article_outlined,
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Please enter PAN number' : null,
+        ),
       ],
     );
   }
-  
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
+
+  Widget _buildEmploymentInfoSection() {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: Colors.amber.shade200.withOpacity(0.7),
-            size: 16,
-          ),
+        // Bus Number
+        _buildTextField(
+          controller: _busNumberController,
+          label: 'ASSIGNED BUS NUMBER',
+          icon: Icons.directions_bus_outlined,
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Please enter bus number' : null,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white54,
-                  fontSize: 10,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-            ),
-          ],
+        const SizedBox(height: 16),
+
+        // Joining Date
+        _buildDatePicker(
+          label: 'JOINING DATE',
+          selectedDate: _joiningDate,
+          onDateSelected: (date) => setState(() => _joiningDate = date),
         ),
-      ),
+        const SizedBox(height: 16),
+
+        // Salary
+        _buildTextField(
+          controller: _salaryController,
+          label: 'SALARY',
+          icon: Icons.currency_rupee_outlined,
+          keyboardType: TextInputType.number,
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Please enter salary' : null,
+        ),
+        const SizedBox(height: 16),
+
+        // Employment Type
+        _buildDropdown(
+          label: 'EMPLOYMENT TYPE',
+          value: _employmentType,
+          items: _employmentTypes,
+          onChanged: (value) => setState(() => _employmentType = value),
+        ),
       ],
     );
   }
-} 
+
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 16,
+          color: primaryBrown,
+          margin: const EdgeInsets.only(right: 8),
+        ),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 11,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePicker({
+    required String label,
+    required DateTime selectedDate,
+    required Function(DateTime) onDateSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: primaryBrown.withOpacity(0.7),
+            fontSize: 12,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
+                DateTime? lastDate;
+                DateTime firstDate;
+
+                switch (label) {
+                  case 'DATE OF BIRTH':
+                    lastDate =
+                        DateTime.now().subtract(const Duration(days: 6570));
+                    firstDate = DateTime(1950);
+                    break;
+                  case 'LICENSE EXPIRY':
+                    firstDate = DateTime.now();
+                    lastDate = DateTime.now().add(const Duration(days: 3650));
+                    break;
+                  default:
+                    firstDate =
+                        DateTime.now().subtract(const Duration(days: 30));
+                    lastDate = DateTime.now().add(const Duration(days: 30));
+                }
+
+                final DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: label == 'DATE OF BIRTH'
+                      ? lastDate ?? DateTime.now()
+                      : selectedDate,
+                  firstDate: firstDate,
+                  lastDate: lastDate ?? DateTime.now(),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: ColorScheme.dark(
+                          primary: primaryBrown,
+                          onPrimary: Colors.white,
+                          surface: secondaryBlue,
+                          onSurface: Colors.white,
+                        ),
+                        dialogBackgroundColor: secondaryBlue,
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+                if (pickedDate != null) {
+                  onDateSelected(pickedDate);
+                }
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: primaryBrown.withOpacity(0.7),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      _formatDate(selectedDate),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.white.withOpacity(0.5),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required Function(String?) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: primaryBrown.withOpacity(0.7),
+            fontSize: 12,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: DropdownButtonFormField<String>(
+            value: value,
+            hint: Text(
+              '---',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 14,
+              ),
+            ),
+            icon: Icon(Icons.arrow_drop_down,
+                color: Colors.white.withOpacity(0.5)),
+            dropdownColor: secondaryBlue,
+            items: items.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.work_outline,
+                size: 20,
+                color: primaryBrown.withOpacity(0.7),
+              ),
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            validator: (value) =>
+                value == null ? 'Please select employment type' : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: primaryBrown.withOpacity(0.7),
+          fontSize: 12,
+          letterSpacing: 1,
+        ),
+        prefixIcon: Icon(icon, color: primaryBrown.withOpacity(0.7), size: 20),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: primaryBrown),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.redAccent.shade200),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.redAccent.shade200),
+        ),
+        errorStyle: TextStyle(color: Colors.redAccent.shade200, fontSize: 10),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      ),
+      validator: validator,
+    );
+  }
+
+  BoxDecoration _getContainerDecoration() {
+    return BoxDecoration(
+      color: Colors.white.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: primaryBrown.withOpacity(0.2),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: primaryBrown.withOpacity(0.1),
+          blurRadius: 8,
+          spreadRadius: 0,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfilePhotoContainer() {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        shape: BoxShape.circle,
+        border: Border.all(color: primaryBrown.withOpacity(0.5)),
+        image: _profilePhoto != null
+            ? DecorationImage(
+                image: FileImage(_profilePhoto!),
+                fit: BoxFit.cover,
+              )
+            : null,
+      ),
+      child: _profilePhoto == null
+          ? Icon(Icons.add_a_photo,
+              color: primaryBrown.withOpacity(0.7), size: 32)
+          : null,
+    );
+  }
+
+  Gradient _getDividerGradient() {
+    return LinearGradient(
+      colors: [
+        Colors.transparent,
+        primaryBrown.withOpacity(0.3),
+        Colors.transparent,
+      ],
+    );
+  }
+}

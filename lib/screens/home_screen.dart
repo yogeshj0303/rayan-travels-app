@@ -1,5 +1,8 @@
+import 'package:driver_application/screens/notifications_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'attendance_screen.dart';
+import 'view_leaves_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -7,10 +10,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define a consistent color palette matching the app's theme
-    final goldAccent = Colors.amber.shade200;
-    final darkGold = Colors.amber.shade800;
-    final darkText = Colors.grey.shade900;
-    
+    final goldAccent = Color(0xFFD88226);
+    final darkGold = Color(0xFFD88226);
+    final darkText = Color(0xFF0B192E);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.white,
@@ -23,7 +26,7 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(20.0, 46.0, 20.0, 16.0),
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: Color(0xFF0B192E),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -52,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         child: CircleAvatar(
                           radius: 24,
-                          backgroundColor: Colors.black,
+                          backgroundColor: Color(0xFF0B192E),
                           child: Icon(
                             Icons.person,
                             size: 24,
@@ -61,23 +64,71 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome back,',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.7),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Text(
+                              'Driver Name',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Stack(
                         children: [
-                          Text(
-                            'Welcome back,',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.7),
-                              fontWeight: FontWeight.w500,
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const NotificationsScreen(),
+                                ),
+                              );
+                            },
+                            icon: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.notifications_outlined,
+                                  color: goldAccent,
+                                  size: 24,
+                                ),
+                              ),
                             ),
                           ),
-                          const Text(
-                            'Driver Name',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          Positioned(
+                            right: 12,
+                            top: 12,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 8,
+                                minHeight: 8,
+                              ),
                             ),
                           ),
                         ],
@@ -90,13 +141,6 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       _buildQuickStat(
                         context,
-                        'Today\'s Trips',
-                        '3',
-                        Icons.directions_car_rounded,
-                        goldAccent,
-                      ),
-                      _buildQuickStat(
-                        context,
                         'Fuel Status',
                         '75%',
                         Icons.local_gas_station_rounded,
@@ -104,17 +148,39 @@ class HomeScreen extends StatelessWidget {
                       ),
                       _buildQuickStat(
                         context,
-                        'Earnings',
-                        '\₹120',
-                        Icons.account_balance_wallet_rounded,
+                        'Attendance',
+                        'Check In',
+                        Icons.fingerprint,
                         goldAccent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AttendanceScreen()),
+                          );
+                        },
+                      ),
+                      _buildQuickStat(
+                        context,
+                        'Leaves',
+                        'View',
+                        Icons.event_note_rounded,
+                        goldAccent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ViewLeavesScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             // Recent activity section
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
@@ -157,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Recent activity list
             Expanded(
               child: ListView(
@@ -198,7 +264,7 @@ class HomeScreen extends StatelessWidget {
                     Icons.event_available_rounded,
                     Colors.teal,
                   ),
-                  
+
                   // Upcoming section
                   Padding(
                     padding: const EdgeInsets.fromLTRB(4, 24, 4, 16),
@@ -222,7 +288,7 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   _buildUpcomingItem(
                     context,
                     'Trip to Mumbai',
@@ -253,44 +319,48 @@ class HomeScreen extends StatelessWidget {
     String title,
     String value,
     IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 1,
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            Icon(
+              icon,
               color: color,
+              size: 24,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.7),
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -361,7 +431,7 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildUpcomingItem(
     BuildContext context,
     String title,
@@ -440,4 +510,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

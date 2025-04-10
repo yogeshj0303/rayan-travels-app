@@ -1,3 +1,4 @@
+import 'package:driver_application/screens/add_expense_screen.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseScreen extends StatelessWidget {
@@ -6,18 +7,18 @@ class ExpenseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define theme colors to match app's design with more professional palette
-    final primaryGold = Colors.amber.shade700;
-    final secondaryGold = Colors.amber.shade300;
-    final darkText = Colors.grey.shade900;
+    final primaryGold = Color(0xFFD88226); // Gold color
+    final secondaryGold = Color(0xFFD88226); // Lighter gold color
+    final darkText = Color(0xFF0B192E); // Dark text color
 
     // Calculate the bottom padding needed to account for the bottom navigation bar
-    final bottomPadding = MediaQuery.of(context).padding.bottom + 65; // 65 is the height of the bottom nav bar
-
+    final bottomPadding = MediaQuery.of(context).padding.bottom +
+        65; // 65 is the height of the bottom nav bar
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF0B192E),
         elevation: 0,
         titleSpacing: 8,
         toolbarHeight: 56, // More compact
@@ -47,9 +48,14 @@ class ExpenseScreen extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: Icon(Icons.add_circle_outline, color: secondaryGold, size: 22),
+            icon:
+                Icon(Icons.add_circle_outline, color: secondaryGold, size: 22),
             onPressed: () {
-              // Add new expense
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AddExpenseScreen()),
+              );
             },
           ),
         ],
@@ -67,8 +73,8 @@ class ExpenseScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF000000),
-                    const Color(0xFF1A1A1A),
+                    const Color(0xFF0B192E),
+                    const Color(0xFF0B192E),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -107,7 +113,7 @@ class ExpenseScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Card content
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -161,7 +167,7 @@ class ExpenseScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         // Middle - Total amount
                         FittedBox(
                           fit: BoxFit.scaleDown,
@@ -199,7 +205,7 @@ class ExpenseScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         // Bottom - Categories summary
                         Row(
                           children: [
@@ -207,7 +213,7 @@ class ExpenseScreen extends StatelessWidget {
                               context,
                               'Fuel',
                               '₹2,250',
-                              secondaryGold, 
+                              secondaryGold,
                               0.48,
                             ),
                             const SizedBox(width: 16),
@@ -235,125 +241,9 @@ class ExpenseScreen extends StatelessWidget {
               ),
             ),
 
-            // Expense Categories
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 3,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: primaryGold,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
-                        margin: const EdgeInsets.only(right: 8),
-                      ),
-                      Text(
-                        'EXPENSE CATEGORIES',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: darkText,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                      minimumSize: const Size(0, 36),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'VIEW ALL',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
-                            letterSpacing: 0.8,
-                            color: primaryGold,
-                          ),
-                        ),
-                        Icon(Icons.chevron_right, size: 16, color: primaryGold),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Expense Categories grid
-            GridView.count(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              crossAxisCount: 4,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 0.9,
-              children: [
-                _buildExpenseCategory(
-                  context,
-                  'Fuel',
-                  Icons.local_gas_station_rounded,
-                  const Color(0xFFFF7043),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Food',
-                  Icons.restaurant,
-                  const Color(0xFFE53935),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Toll',
-                  Icons.car_rental,
-                  const Color(0xFF42A5F5),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Maintenance',
-                  Icons.build_rounded,
-                  const Color(0xFF7C4DFF),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Parking',
-                  Icons.local_parking_rounded,
-                  const Color(0xFF66BB6A),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Phone',
-                  Icons.phone_android,
-                  const Color(0xFF29B6F6),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'Hotel',
-                  Icons.hotel,
-                  const Color(0xFFFFCA28),
-                ),
-                _buildExpenseCategory(
-                  context,
-                  'More',
-                  Icons.more_horiz,
-                  const Color(0xFF78909C),
-                ),
-              ],
-            ),
-
             // Recent Transactions
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -383,7 +273,8 @@ class ExpenseScreen extends StatelessWidget {
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: primaryGold,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
                       minimumSize: const Size(0, 36),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -493,75 +384,6 @@ class ExpenseScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExpenseCategory(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // Handle category tap
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                height: 34,
-                width: 34,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Flexible(
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildExpenseItem(
     BuildContext context,
     String title,
@@ -615,7 +437,7 @@ class ExpenseScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                
+
                 // Expense details
                 Expanded(
                   child: Column(
@@ -674,4 +496,4 @@ class ExpenseScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}
